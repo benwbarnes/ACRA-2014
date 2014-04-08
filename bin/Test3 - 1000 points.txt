@@ -1,0 +1,356 @@
+Cycle number:		0
+ImageFetch period:	0.0169193 seconds
+CalcFlow period:	0.159197 seconds
+MainLoop period:	0.176825 seconds
+Main loop frequency:	5.65249 Hz
+Active points:		374
+
+Cycle number:		1
+ImageFetch period:	0.0163245 seconds
+CalcFlow period:	0.158388 seconds
+MainLoop period:	0.175105 seconds
+Main loop frequency:	5.70834 Hz
+Active points:		374
+
+Cycle number:		2
+ImageFetch period:	0.0160849 seconds
+CalcFlow period:	0.159352 seconds
+MainLoop period:	0.175743 seconds
+Main loop frequency:	5.68959 Hz
+Active points:		374
+
+Cycle number:		3
+ImageFetch period:	0.0161986 seconds
+CalcFlow period:	0.159073 seconds
+MainLoop period:	0.175591 seconds
+Main loop frequency:	5.69457 Hz
+Active points:		374
+
+Cycle number:		4
+ImageFetch period:	0.0170103 seconds
+CalcFlow period:	0.184376 seconds
+MainLoop period:	0.20198 seconds
+Main loop frequency:	4.94871 Hz
+Active points:		374
+
+Cycle number:		5
+ImageFetch period:	0.0286076 seconds
+CalcFlow period:	0.163145 seconds
+MainLoop period:	0.192101 seconds
+Main loop frequency:	5.20519 Hz
+Active points:		374
+
+Cycle number:		6
+ImageFetch period:	0.0167585 seconds
+CalcFlow period:	0.159458 seconds
+MainLoop period:	0.176885 seconds
+Main loop frequency:	5.65286 Hz
+Active points:		374
+
+Cycle number:		7
+ImageFetch period:	0.0170049 seconds
+CalcFlow period:	0.160751 seconds
+MainLoop period:	0.178557 seconds
+Main loop frequency:	5.59994 Hz
+Active points:		374
+
+Cycle number:		8
+ImageFetch period:	0.0179063 seconds
+CalcFlow period:	0.163544 seconds
+MainLoop period:	0.181752 seconds
+Main loop frequency:	5.5015 Hz
+Active points:		374
+
+Cycle number:		9
+ImageFetch period:	0.0156011 seconds
+CalcFlow period:	0.175424 seconds
+MainLoop period:	0.192717 seconds
+Main loop frequency:	5.18852 Hz
+Active points:		374
+
+Cycle number:		10
+ImageFetch period:	0.0340608 seconds
+CalcFlow period:	0.228976 seconds
+MainLoop period:	0.263382 seconds
+Main loop frequency:	3.79652 Hz
+Active points:		374
+
+Cycle number:		11
+ImageFetch period:	0.0184988 seconds
+CalcFlow period:	0.175397 seconds
+MainLoop period:	0.194188 seconds
+Main loop frequency:	5.14922 Hz
+Active points:		374
+
+Cycle number:		12
+ImageFetch period:	0.0179828 seconds
+CalcFlow period:	0.1719 seconds
+MainLoop period:	0.190062 seconds
+Main loop frequency:	5.26101 Hz
+Active points:		374
+
+Cycle number:		13
+ImageFetch period:	0.01725 seconds
+CalcFlow period:	0.167045 seconds
+MainLoop period:	0.184592 seconds
+Main loop frequency:	5.41687 Hz
+Active points:		374
+
+Cycle number:		14
+ImageFetch period:	0.0169477 seconds
+CalcFlow period:	0.179591 seconds
+MainLoop period:	0.197092 seconds
+Main loop frequency:	5.07169 Hz
+Active points:		374
+
+Cycle number:		15
+ImageFetch period:	0.022187 seconds
+CalcFlow period:	0.179119 seconds
+MainLoop period:	0.201533 seconds
+Main loop frequency:	4.96156 Hz
+Active points:		374
+
+Cycle number:		16
+ImageFetch period:	0.0193478 seconds
+CalcFlow period:	0.160796 seconds
+MainLoop period:	0.180293 seconds
+Main loop frequency:	5.54602 Hz
+Active points:		374
+
+Cycle number:		17
+ImageFetch period:	0.0191 seconds
+CalcFlow period:	0.175201 seconds
+MainLoop period:	0.196345 seconds
+Main loop frequency:	5.09263 Hz
+Active points:		374
+
+Cycle number:		18
+ImageFetch period:	0.0229283 seconds
+CalcFlow period:	0.203518 seconds
+MainLoop period:	0.228801 seconds
+Main loop frequency:	4.3703 Hz
+Active points:		374
+
+Cycle number:		19
+ImageFetch period:	0.0272091 seconds
+CalcFlow period:	0.256828 seconds
+MainLoop period:	0.286564 seconds
+Main loop frequency:	3.48835 Hz
+Active points:		374
+
+Cycle number:		20
+ImageFetch period:	0.0216639 seconds
+CalcFlow period:	0.179437 seconds
+MainLoop period:	0.203449 seconds
+Main loop frequency:	4.91484 Hz
+Active points:		374
+
+Cycle number:		21
+ImageFetch period:	0.0241585 seconds
+CalcFlow period:	0.163153 seconds
+MainLoop period:	0.189166 seconds
+Main loop frequency:	5.28592 Hz
+Active points:		374
+
+Cycle number:		22
+ImageFetch period:	0.0179228 seconds
+CalcFlow period:	0.182089 seconds
+MainLoop period:	0.202203 seconds
+Main loop frequency:	4.94511 Hz
+Active points:		374
+
+Cycle number:		23
+ImageFetch period:	0.0238908 seconds
+CalcFlow period:	0.202454 seconds
+MainLoop period:	0.226517 seconds
+Main loop frequency:	4.41437 Hz
+Active points:		374
+
+Cycle number:		24
+ImageFetch period:	0.0247618 seconds
+CalcFlow period:	0.268364 seconds
+MainLoop period:	0.295228 seconds
+Main loop frequency:	3.38704 Hz
+Active points:		374
+
+Cycle number:		25
+ImageFetch period:	0.01909 seconds
+CalcFlow period:	0.180607 seconds
+MainLoop period:	0.199943 seconds
+Main loop frequency:	5.00104 Hz
+Active points:		374
+
+Cycle number:		26
+ImageFetch period:	0.0184565 seconds
+CalcFlow period:	0.184236 seconds
+MainLoop period:	0.204435 seconds
+Main loop frequency:	4.89118 Hz
+Active points:		375
+
+Cycle number:		27
+ImageFetch period:	0.0273412 seconds
+CalcFlow period:	0.198322 seconds
+MainLoop period:	0.227904 seconds
+Main loop frequency:	4.38752 Hz
+Active points:		374
+
+Cycle number:		28
+ImageFetch period:	0.0183867 seconds
+CalcFlow period:	0.212928 seconds
+MainLoop period:	0.231611 seconds
+Main loop frequency:	4.31728 Hz
+Active points:		375
+
+Cycle number:		29
+ImageFetch period:	0.0180084 seconds
+CalcFlow period:	0.18054 seconds
+MainLoop period:	0.198846 seconds
+Main loop frequency:	5.0286 Hz
+Active points:		375
+
+Cycle number:		30
+ImageFetch period:	0.0190408 seconds
+CalcFlow period:	0.174621 seconds
+MainLoop period:	0.195648 seconds
+Main loop frequency:	5.11081 Hz
+Active points:		375
+
+Cycle number:		31
+ImageFetch period:	0.0234566 seconds
+CalcFlow period:	0.190222 seconds
+MainLoop period:	0.215802 seconds
+Main loop frequency:	4.63352 Hz
+Active points:		374
+
+Cycle number:		32
+ImageFetch period:	0.0247241 seconds
+CalcFlow period:	0.18912 seconds
+MainLoop period:	0.215865 seconds
+Main loop frequency:	4.63216 Hz
+Active points:		375
+
+Cycle number:		33
+ImageFetch period:	0.0184623 seconds
+CalcFlow period:	0.236268 seconds
+MainLoop period:	0.25654 seconds
+Main loop frequency:	3.89779 Hz
+Active points:		374
+
+Cycle number:		34
+ImageFetch period:	0.0196338 seconds
+CalcFlow period:	0.169045 seconds
+MainLoop period:	0.189151 seconds
+Main loop frequency:	5.28632 Hz
+Active points:		375
+
+Cycle number:		35
+ImageFetch period:	0.019092 seconds
+CalcFlow period:	0.175178 seconds
+MainLoop period:	0.194563 seconds
+Main loop frequency:	5.13925 Hz
+Active points:		375
+
+Cycle number:		36
+ImageFetch period:	0.0185154 seconds
+CalcFlow period:	0.192321 seconds
+MainLoop period:	0.211128 seconds
+Main loop frequency:	4.73613 Hz
+Active points:		375
+
+Cycle number:		37
+ImageFetch period:	0.0184693 seconds
+CalcFlow period:	0.197004 seconds
+MainLoop period:	0.217566 seconds
+Main loop frequency:	4.59397 Hz
+Active points:		374
+
+Cycle number:		38
+ImageFetch period:	0.0341657 seconds
+CalcFlow period:	0.208231 seconds
+MainLoop period:	0.242884 seconds
+Main loop frequency:	4.11691 Hz
+Active points:		374
+
+Cycle number:		39
+ImageFetch period:	0.0194316 seconds
+CalcFlow period:	0.190328 seconds
+MainLoop period:	0.212352 seconds
+Main loop frequency:	4.70877 Hz
+Active points:		375
+
+Cycle number:		40
+ImageFetch period:	0.0190863 seconds
+CalcFlow period:	0.15873 seconds
+MainLoop period:	0.178122 seconds
+Main loop frequency:	5.61362 Hz
+Active points:		375
+
+Cycle number:		41
+ImageFetch period:	0.0179922 seconds
+CalcFlow period:	0.192905 seconds
+MainLoop period:	0.212812 seconds
+Main loop frequency:	4.69865 Hz
+Active points:		375
+
+Cycle number:		42
+ImageFetch period:	0.01686 seconds
+CalcFlow period:	0.219898 seconds
+MainLoop period:	0.238893 seconds
+Main loop frequency:	4.15649 Hz
+Active points:		374
+
+Cycle number:		43
+ImageFetch period:	0.026838 seconds
+CalcFlow period:	0.203154 seconds
+MainLoop period:	0.230516 seconds
+Main loop frequency:	4.33584 Hz
+Active points:		375
+
+Cycle number:		44
+ImageFetch period:	0.0327666 seconds
+CalcFlow period:	0.208596 seconds
+MainLoop period:	0.24169 seconds
+Main loop frequency:	4.13725 Hz
+Active points:		375
+
+Cycle number:		45
+ImageFetch period:	0.0173026 seconds
+CalcFlow period:	0.174813 seconds
+MainLoop period:	0.192599 seconds
+Main loop frequency:	5.19171 Hz
+Active points:		375
+
+Cycle number:		46
+ImageFetch period:	0.0171053 seconds
+CalcFlow period:	0.169919 seconds
+MainLoop period:	0.187367 seconds
+Main loop frequency:	5.33663 Hz
+Active points:		375
+
+Cycle number:		47
+ImageFetch period:	0.0168695 seconds
+CalcFlow period:	0.197578 seconds
+MainLoop period:	0.214956 seconds
+Main loop frequency:	4.65177 Hz
+Active points:		375
+
+Cycle number:		48
+ImageFetch period:	0.0173823 seconds
+CalcFlow period:	0.174214 seconds
+MainLoop period:	0.193643 seconds
+Main loop frequency:	5.16369 Hz
+Active points:		374
+
+Cycle number:		49
+ImageFetch period:	0.0183924 seconds
+CalcFlow period:	0.172144 seconds
+MainLoop period:	0.190895 seconds
+Main loop frequency:	5.23803 Hz
+Active points:		375
+
+Cycle number:		50
+ImageFetch period:	0.0183705 seconds
+CalcFlow period:	0.171823 seconds
+MainLoop period:	0.190493 seconds
+Main loop frequency:	5.24909 Hz
+Active points:		374
