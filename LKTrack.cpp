@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 	cv::TermCriteria termCrit = cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01);
 	Points p, prevP;
 	int numPoints;
+	int frameLimit;
 	bool displayOn;
 
 	Timer mainLoop("MainLoop");
@@ -24,13 +25,14 @@ int main(int argc, char *argv[])
 	Display display("App");
 	Tracker lktracker(termCrit);
 
-	if(argc != 3)
+	if(argc != 4)
 	{
-		std::cout << "Usage: " << argv[0] << " num_points display[on|off]" << std::endl;
+		std::cout << "Usage: " << argv[0] << " num_points display[on|off] frame_limit" << std::endl;
 		return -1;
 	}
 
 	numPoints = atoi(argv[1]);
+	frameLimit = atoi(argv[3]);
 	lktracker.setMaxPoints(numPoints);
 	if(strncmp(argv[2], "on", 2)) displayOn = false;
 	else displayOn = true;
@@ -44,27 +46,31 @@ int main(int argc, char *argv[])
 	prevFrame = firefly.getCVFrame();
 	prevP.points = lktracker.getPoints(prevFrame); /* Gets initial point set using feature detection. */
 
-	std::cout << std::endl; /* Break between initialisation text and loop text. */
 	char keyPressed;
 	uint numCycles = 0;
-	while(keyPressed != 'q')
+	double ml_secs, fetch_secs, flow_secs, display_secs;
+
+	std::cout << "Cycle\tMain Loop\tFetch\tFlow\tPoints" << std::endl;
+
+	while(keyPressed != 'q' && numCycles < frameLimit)
 	{
 		mainLoop.mark(); /* Begin loop timer. */
-		std::cout << "Cycle number:\t\t" << numCycles << std::endl;
-		numCycles++;
 		imageFetch.mark(); /* Begin image fetch timer. */
 		frame = firefly.getCVFrame();
-		imageFetch.print(); /* End image fetch timer. */
+		fetch_secs = imageFetch.read();
+//		imageFetch.print(); /* End image fetch timer. */
 
 		calcFlow.mark(); /*Begin flow calculation timer. */
 		p = lktracker.calcFlow(prevFrame, frame, prevP);
-		calcFlow.print(); /* End flow calculation timer. */
+		flow_secs = calcFlow.read();
+//		calcFlow.print(); /* End flow calculation timer. */
 
 		if(displayOn)
 		{
 			displayTimer.mark(); /* Begin display timer. */
 			keyPressed = display.render(frame, p);
-			displayTimer.print(); /* End display timer. */
+			display_secs = displayTimer.read();
+//			displayTimer.print(); /* End display timer. */
 		}
 
 		if(keyPressed == 'r')
@@ -74,11 +80,10 @@ int main(int argc, char *argv[])
 
 		prevP = p;
 		prevFrame = frame;
-		mainLoop.print(); /* End loop timer. */
-		std::cout << "Main loop frequency:\t" << 1.0/mainLoop.read() << " Hz" <<  std::endl;
-		std::cout << "Active points:\t\t" << activePoints(prevP) << std::endl;
-
-		std::cout << std::endl; /* Separates timer brackets. */
+		ml_secs = mainLoop.read();
+//		mainLoop.print(); /* End loop timer. */
+		std::cout << numCycles << '\t' << ml_secs << '\t' << fetch_secs << '\t' << flow_secs << '\t' << activePoints(prevP) << std::endl;
+		numCycles++;
 	}
 
 	firefly.close();

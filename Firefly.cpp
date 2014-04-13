@@ -17,7 +17,7 @@ int Firefly::open()
 		return -1;
 	}
 
-	printf("Number of cameras detected: %d\n", numCameras);
+//	printf("Number of cameras detected: %d\n", numCameras);
 
 	error = busMgr.GetCameraFromIndex(0, &guid); /* Default to first camera. */
 	if(error != PGRERROR_OK)
@@ -54,7 +54,7 @@ int Firefly::open()
 		return -1;
 	}
 
-	printf("Camera opened successfully.\n");
+//	printf("Camera opened successfully.\n");
 	return 0;
 }
 
