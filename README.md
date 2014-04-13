@@ -2,7 +2,7 @@
 
 This software provides functionality relating to optical flow on an ODROID platform. This includes:
  * Point Grey Firefly camera interface code
- > Includes conversion of images to OpenCV datatypes
+ 	* Includes conversion of images to OpenCV datatypes
  * Display code to visualise points
  * A simple timer class allowing for rudimentary function profiling
 
@@ -11,7 +11,7 @@ This code is currently *very* rough. Whilst some effort has been made to keep th
 ## Brief guide to the source code
 
  * LKTrack
- > Entry point/main application loop. Implements all functionality including command line argument parsing, timers, and output.
+ 	* Entry point/main application loop. Implements all functionality including command line argument parsing, timers, and output.
  * Display
  * Firefly
  * Makefile
@@ -19,4 +19,4 @@ This code is currently *very* rough. Whilst some effort has been made to keep th
  * Timer
  * Tracker
  * Makefile
- > For this code to compile you must have the OpenCV and Point Grey Flycapture libraries installed in the listed locations.
+ 	* For this code to compile you must have the OpenCV and Point Grey Flycapture libraries installed in the listed locations.
