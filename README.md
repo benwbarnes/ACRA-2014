@@ -1,6 +1,6 @@
 # Quadcopter Linux Development
 
-This software provides functionality relating to optical flow on an ODROID platform. This includes:
+This software provides functionality relating to optical flow on an ODROID platform. This includes\:
  * Point Grey Firefly camera interface code
  	* Includes conversion of images to OpenCV datatypes
  * Display code to visualise points
