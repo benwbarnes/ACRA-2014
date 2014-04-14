@@ -1,6 +1,6 @@
 #include "Firefly.hpp"
 
-Firefly::Firefly() : image(640, 480, CV_8UC3, 255) {};
+Firefly::Firefly() : image(640, 480, CV_8UC3, 255), seqNum(-1) {};
 
 int Firefly::open()
 {
@@ -60,8 +60,29 @@ void onImageGet(Image *pImage, const void *fly)
 	_fly.pushImage(pImage);
 }
 
-int Firefly::start()
+int Firefly::start(int mode)
 {
+	uint32_t register_contents;
+	/* Note that the Firefly appears to use a Big endian architecture. */
+	/* (so the bit positions here do not match the datasheet) */
+	if(mode == EXTERNAL)
+	{
+		/* Set up registers */
+		cam.ReadRegister(0x830, &register_contents);
+		register_contents |= (1<<25);
+		register_contents &= ~(1<<16 | 1<<17 | 1<<18 | 1<<19);
+		cam.WriteRegister(0x830, register_contents);
+	}
+
+	else
+	{
+		/* Set up registers */
+		cam.ReadRegister(0x830, &register_contents);
+		register_contents &= ~(1<<16 | 1<<17 | 1<<18 | 1<<19 | 1<<25);
+		cam.WriteRegister(0x830, register_contents);
+	}
+
+	/* Start isochronous capture with callback. */
 	error = cam.StartCapture(onImageGet, this);
 	if(error != PGRERROR_OK)
 	{
@@ -104,7 +125,7 @@ void Firefly::pushImage(Image *rawImage)
 	result = cv::Mat(BGRImage.GetRows(), BGRImage.GetCols(), CV_8UC3, BGRImage.GetData(), rowBytes);
 	cv::cvtColor(result, result, cv::COLOR_BGR2GRAY);
 	image = result;
-	std::cout << "Seq: " << seqNum << std::endl;
+//	std::cout << "Seq: " << seqNum << std::endl;
 	seqNum++;
 }
 

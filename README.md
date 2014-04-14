@@ -33,4 +33,6 @@ This code is currently *very* rough. Whilst some effort has been made to keep th
  * Switched Firefly code to an event-driven system. This uses a callback attached to the camera which is triggered after each image upload.
  > The purpose of this is to allow an easier transition to externally triggered image capturing. The Firefly code itself is reasonably robust, but the main code is currently an awful hackjob. As an example, the code currently blocks with a test like this: 
 	`while((seqNum = firefly.getSeqNum()) == prevSeqNum)`
-This feels questionably thread-safe; a better solution would be to make all operations event-driven. This is a task for later.
+This feels iffy; a better solution would be to make all operations event-driven. This is a task for later.
+ * Added external triggering as an option on Firefly::start(int). This was tested with a pushbutton and breadboard and appears to work fine. Passing either EXTERNAL or FREERUN to the start function sets the implied mode by writing to the relevant Firefly register. Exported this option to a command line argument. The list of arguments is getting a bit unwieldy; a config file parser might be sensible at some point.
+

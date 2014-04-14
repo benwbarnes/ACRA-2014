@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 	Points p, prevP;
 	int numPoints;
 	int frameLimit;
+	int triggering;
 	bool displayOn;
 
 	Timer mainLoop("MainLoop");
@@ -25,9 +26,9 @@ int main(int argc, char *argv[])
 	Display display("App");
 	Tracker lktracker(termCrit);
 
-	if(argc != 4)
+	if(argc != 5)
 	{
-		std::cout << "Usage: " << argv[0] << " num_points display[on|off] frame_limit" << std::endl;
+		std::cout << "Usage: " << argv[0] << " num_points display[on|off] frame_limit triggering[external|freerun]" << std::endl;
 		return -1;
 	}
 
@@ -36,6 +37,8 @@ int main(int argc, char *argv[])
 	lktracker.setMaxPoints(numPoints);
 	if(strncmp(argv[2], "on", 2)) displayOn = false;
 	else displayOn = true;
+	if(strncmp(argv[4], "freerun", 7)) triggering = EXTERNAL;
+	else triggering = FREERUN;
 
 	if(firefly.open())
 	{
@@ -43,7 +46,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	firefly.start();
+	firefly.start(triggering);
 	while(firefly.getSeqNum() < 0); /* Blocks until first image capture. */
 	prevFrame = firefly.getImage();
 	prevP.points = lktracker.getPoints(prevFrame); /* Gets initial point set using feature detection. */
