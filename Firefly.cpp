@@ -1,5 +1,7 @@
 #include "Firefly.hpp"
 
+Firefly::Firefly() : image(640, 480, CV_8UC3, 255) {};
+
 int Firefly::open()
 {
 	unsigned int numCameras;
@@ -17,7 +19,7 @@ int Firefly::open()
 		return -1;
 	}
 
-//	printf("Number of cameras detected: %d\n", numCameras);
+	printf("Number of cameras detected: %d\n", numCameras);
 
 	error = busMgr.GetCameraFromIndex(0, &guid); /* Default to first camera. */
 	if(error != PGRERROR_OK)
@@ -47,14 +49,25 @@ int Firefly::open()
 		return -1;
 	}
 
-	error = cam.StartCapture();
+	printf("Camera opened successfully.\n");
+	return 0;
+}
+
+/* Note: this is a static callback function, not part of the Firefly class. */
+void onImageGet(Image *pImage, const void *fly)
+{
+	Firefly &_fly = *(Firefly*)fly; /* Icky pointer casting to get the original object which called start() */
+	_fly.pushImage(pImage);
+}
+
+int Firefly::start()
+{
+	error = cam.StartCapture(onImageGet, this);
 	if(error != PGRERROR_OK)
 	{
 		PrintError(error);
 		return -1;
 	}
-
-//	printf("Camera opened successfully.\n");
 	return 0;
 }
 
@@ -82,28 +95,25 @@ void Firefly::PrintError(Error error)
 	error.PrintErrorTrace();
 }
 
-cv::Mat Firefly::getCVFrame()
+void Firefly::pushImage(Image *rawImage)
 {
-	Image rawImage;
 	Image BGRImage;
-	cv::Mat image;
-
-	if(!cam.IsConnected())
-	{
-		printf("Error: camera not connected.\n");
-		return image;
-	}
-
-	error = cam.RetrieveBuffer(&rawImage);
-	if(error != PGRERROR_OK)
-	{
-		PrintError(error);
-		return image;
-	}
-
-	rawImage.Convert(PIXEL_FORMAT_BGR, &BGRImage);
+	cv::Mat result;
+	rawImage->Convert(PIXEL_FORMAT_BGR, &BGRImage);
 	unsigned int rowBytes = BGRImage.GetReceivedDataSize()/BGRImage.GetRows();
-	image = cv::Mat(BGRImage.GetRows(), BGRImage.GetCols(), CV_8UC3, BGRImage.GetData(), rowBytes);
-	cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
+	result = cv::Mat(BGRImage.GetRows(), BGRImage.GetCols(), CV_8UC3, BGRImage.GetData(), rowBytes);
+	cv::cvtColor(result, result, cv::COLOR_BGR2GRAY);
+	image = result;
+	std::cout << "Seq: " << seqNum << std::endl;
+	seqNum++;
+}
+
+int Firefly::getSeqNum()
+{
+	return seqNum;
+}
+
+cv::Mat Firefly::getImage()
+{
 	return image;
 }

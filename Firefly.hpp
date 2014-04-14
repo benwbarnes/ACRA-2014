@@ -14,14 +14,19 @@ class Firefly
 	CameraInfo camInfo;
 	BusManager busMgr; /* Point Grey BusManager, enumerates cameras. */
 	Error error; /* Point Grey error container. */
+	cv::Mat image;
+	int seqNum = -1; /* Sequence is zero-indexed; -1 indicates no images captured. */
 
 	void PrintError(Error);
 
 	public:
+	Firefly();
 	int open();
 	int close();
-
-	cv::Mat getCVFrame(); /* Return a Frame object with metadata. */
+	int start();
+	void pushImage(Image*);
+	int getSeqNum();
+	cv::Mat getImage();
 };
 
 #endif

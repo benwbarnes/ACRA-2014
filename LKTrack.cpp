@@ -43,20 +43,23 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	prevFrame = firefly.getCVFrame();
+	firefly.start();
+	while(firefly.getSeqNum() < 0); /* Blocks until first image capture. */
+	prevFrame = firefly.getImage();
 	prevP.points = lktracker.getPoints(prevFrame); /* Gets initial point set using feature detection. */
 
 	char keyPressed;
 	uint numCycles = 0;
 	double ml_secs, fetch_secs, flow_secs, display_secs;
 
-	std::cout << "Cycle\tMain Loop\tFetch\tFlow\tPoints" << std::endl;
+	int seqNum, prevSeqNum = firefly.getSeqNum();
 
+	std::cout << "Cycle\tMain Loop\tFetch\tFlow\tPoints" << std::endl;
 	while(keyPressed != 'q' && numCycles < frameLimit)
 	{
 		mainLoop.mark(); /* Begin loop timer. */
 		imageFetch.mark(); /* Begin image fetch timer. */
-		frame = firefly.getCVFrame();
+		frame = firefly.getImage();
 		fetch_secs = imageFetch.read();
 //		imageFetch.print(); /* End image fetch timer. */
 
@@ -84,6 +87,8 @@ int main(int argc, char *argv[])
 //		mainLoop.print(); /* End loop timer. */
 		std::cout << numCycles << '\t' << ml_secs << '\t' << fetch_secs << '\t' << flow_secs << '\t' << activePoints(prevP) << std::endl;
 		numCycles++;
+		while((seqNum = firefly.getSeqNum()) == prevSeqNum); /* Blocks until next frame comes through */
+		prevSeqNum = seqNum;
 	}
 
 	firefly.close();
