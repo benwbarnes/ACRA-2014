@@ -2,18 +2,21 @@
 #define DISPLAY_H
 
 #include <opencv.hpp>
-#include "Points.hpp"
+#include "FlowFrame.hpp"
 
 class Display
 {
-	private:
-		const char *_appTitle;
-		void addPoints(cv::Mat, Points);
-
 	public:
-		Display(const char*);
+		Display(std::string);
+		Display(const Display&) = delete;
+		Display& operator= (const Display&) = delete;
 		~Display();
-		char render(cv::Mat, Points);
+		char render(const cv::Mat&);
+		char render(const FlowFrame&);
+
+	private:
+		const std::string appTitle;
+		void imageToBGR(cv::Mat &image);
 };
 
 #endif

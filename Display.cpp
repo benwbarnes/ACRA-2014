@@ -1,44 +1,46 @@
 #include "Display.hpp"
 
-Display::Display(const char *appTitle) : _appTitle(appTitle)
+Display::Display(std::string appTitle) : appTitle(appTitle)
 {
-	cv::namedWindow(_appTitle, cv::WINDOW_AUTOSIZE);
+	cv::namedWindow(appTitle, cv::WINDOW_AUTOSIZE);
 }
 
 Display::~Display()
 {
-	cv::destroyWindow(_appTitle);
+	cv::destroyWindow(appTitle);
 }
 
-char Display::render(cv::Mat frame, Points p)
+char Display::render(const cv::Mat &frame)
 {
 	char keyPressed;
-	cv::Mat display;
-
-	/* Converts 1-channel greyscale to 3-channel BGR */
-	std::vector<cv::Mat> channels;
-	for(int i = 0; i < 3; i++) channels.push_back(frame);
-	cv::merge(channels, display);
-
-	addPoints(display, p);
-	cv::imshow(_appTitle, display);
+	cv::imshow(appTitle, frame);
 	keyPressed = cv::waitKey(1);
 	return keyPressed;
 }
 
-void Display::addPoints(cv::Mat frame, Points p)
+char Display::render(const FlowFrame &frame)
 {
-	if(p.points.size() != p.status.size())
-	{
-		std::cout << "Error: points.size() != status.size()" << std::endl;
-		return;
+	cv::Mat image = frame.image.clone();
+
+	if(frame.status.size() != frame.points.size()) {
+		std::cerr << "Frame error: \"points\" and \"status\" vectors of different dimension." << std::endl;
+		return '\0';
 	}
 
-	for(uint i = 0; i < p.points.size(); i++)
-	{
-		if(p.status[i] != 0)
-		{
-			cv::circle(frame, p.points[i], 2, cv::Scalar(0, 255, 0), -1, 8);
+	imageToBGR(image); /* Allows coloured dots to be displayed. */
+	for(uint i = 0; i < frame.status.size(); i++) {
+		if(frame.status[i] != 0) {
+			cv::circle(image, frame.points[i], 2, cv::Scalar(0, 255, 0), -1, 8);
 		}
 	}
+
+	char keyPressed = render(image);
+	return keyPressed;
+}
+
+void Display::imageToBGR(cv::Mat &image)
+{
+	std::vector<cv::Mat> channels;
+	for(int i = 0; i < 3; i++) channels.push_back(image);
+	cv::merge(channels, image);
 }

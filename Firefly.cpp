@@ -1,71 +1,50 @@
 #include "Firefly.hpp"
 
-Firefly::Firefly() : image(640, 480, CV_8UC3, 255), seqNum(-1) {};
+Firefly::Firefly(libconfig::Setting &settings) : settings(settings), cam(), busMgr(), guid(), error(), bufferQueue(), queueMutex(), dataReady()
+{
+	open();
+	start();
+}
+
+Firefly::~Firefly()
+{
+	stop();
+	close();
+}
 
 int Firefly::open()
 {
-	unsigned int numCameras;
-	error = busMgr.GetNumOfCameras(&numCameras);
-
-	if(error != PGRERROR_OK)
-	{
-		PrintError(error);
-		return -1;
-	}
-
-	if(numCameras < 1)
-	{
-		printf("No cameras detected.\n");
-		return -1;
-	}
-
-	printf("Number of cameras detected: %d\n", numCameras);
-
 	error = busMgr.GetCameraFromIndex(0, &guid); /* Default to first camera. */
-	if(error != PGRERROR_OK)
+	if(error != FlyCapture2::PGRERROR_OK)
 	{
-		PrintError(error);
-		return -1;
+		throw std::runtime_error(std::string("Error finding camera: ") + error.GetDescription());	
 	}
 
 	error = cam.Connect(&guid);
-	if(error != PGRERROR_OK)
+	if(error != FlyCapture2::PGRERROR_OK)
 	{
-		PrintError(error);
-		return -1;
+		throw std::runtime_error(std::string("Error connecting to camera: ") + error.GetDescription());
 	}
 
-	error = cam.SetVideoModeAndFrameRate(VIDEOMODE_640x480Y8, FRAMERATE_30);
-	if(error != PGRERROR_OK)
+	error = cam.SetVideoModeAndFrameRate(FlyCapture2::VIDEOMODE_640x480Y8, FlyCapture2::FRAMERATE_30);
+	if(error != FlyCapture2::PGRERROR_OK)
 	{
-		PrintError(error);
-		return -1;
+		throw std::runtime_error(std::string("Error setting video mode: ") + error.GetDescription());
 	}
-
-	error = cam.GetCameraInfo(&camInfo);
-	if(error != PGRERROR_OK)
-	{
-		PrintError(error);
-		return -1;
-	}
-
-	printf("Camera opened successfully.\n");
 	return 0;
 }
 
-/* Note: this is a static callback function, not part of the Firefly class. */
-void onImageGet(Image *pImage, const void *fly)
-{
-	Firefly &_fly = *(Firefly*)fly; /* Icky pointer casting to get the original object which called start() */
-	_fly.pushImage(pImage);
-}
-
-int Firefly::start(int mode)
+int Firefly::start()
 {
 	uint32_t register_contents;
 	/* Note that the Firefly appears to use a Big endian architecture. */
 	/* (so the bit positions here do not match the datasheet) */
-	if(mode == EXTERNAL)
+	bool externalTrigger = false;
+	if(!settings.lookupValue("camera/externalTrigger", externalTrigger)) {
+		throw std::runtime_error(std::string("Error in configuration file: could not find setting \"camera/triggerMode\""));
+	}
+	
+	if(externalTrigger)
 	{
 		/* Set up registers */
 		cam.ReadRegister(0x830, &register_contents);
@@ -82,11 +61,31 @@ int Firefly::start(int mode)
 		cam.WriteRegister(0x830, register_contents);
 	}
 
-	/* Start isochronous capture with callback. */
+	/* Define a lambda expression to use as a callback. *
+	 * ------------------------------------------------
+	 * NOTE - unfortunately, it is impossible to capture [this] and simply call this->pushImage(),
+	 * allowing pushImage() to be properly encapsulated.
+	 * Here is why: the C++ standard dictates that a lambda expression with an empty capture list
+	 * is compiled to a function, whereas one with a populated capture list compiles to a 'lambda' 
+	 * class with an overloaded call operator. The compiled FlyCapture2 function will accept a
+	 * function pointer, but it will not accept a lambda object. */
+
+	auto onImageGet = [] (FlyCapture2::Image *pImage, const void *fly) { ((Firefly*) fly)->pushImage(pImage); };
+	
 	error = cam.StartCapture(onImageGet, this);
-	if(error != PGRERROR_OK)
+	if(error != FlyCapture2::PGRERROR_OK)
 	{
-		PrintError(error);
+		throw std::runtime_error(std::string("Error starting capture"));
+	}
+	return 0;
+}
+
+int Firefly::stop()
+{
+	error = cam.StopCapture();
+	if(error != FlyCapture2::PGRERROR_OK)
+	{
+		error.PrintErrorTrace();
 		return -1;
 	}
 	return 0;
@@ -94,47 +93,41 @@ int Firefly::start(int mode)
 
 int Firefly::close()
 {
-	error = cam.StopCapture();
-	if(error != PGRERROR_OK)
-	{
-		PrintError(error);
-		return -1;
-	}
-
 	error = cam.Disconnect();
-	if(error != PGRERROR_OK)
+	if(error != FlyCapture2::PGRERROR_OK)
 	{
-		PrintError(error);
+		error.PrintErrorTrace();
 		return -1;
 	}
-	printf("Camera closed.\n");
 	return 0;
 }
 
-void Firefly::PrintError(Error error)
+void Firefly::pushImage(FlyCapture2::Image *rawImage)
 {
-	error.PrintErrorTrace();
-}
-
-void Firefly::pushImage(Image *rawImage)
-{
-	Image BGRImage;
+	FlyCapture2::Image BGRImage;
 	cv::Mat result;
-	rawImage->Convert(PIXEL_FORMAT_BGR, &BGRImage);
+	/* This code translates from FlyCapture2::Image to cv::Mat via their low-level data structures. */
+	rawImage->Convert(FlyCapture2::PIXEL_FORMAT_BGR, &BGRImage);
 	unsigned int rowBytes = BGRImage.GetReceivedDataSize()/BGRImage.GetRows();
 	result = cv::Mat(BGRImage.GetRows(), BGRImage.GetCols(), CV_8UC3, BGRImage.GetData(), rowBytes);
 	cv::cvtColor(result, result, cv::COLOR_BGR2GRAY);
-	image = result;
-//	std::cout << "Seq: " << seqNum << std::endl;
-	seqNum++;
+	
+	std::unique_lock<std::mutex> locker(queueMutex);
+	bufferQueue.push(result);
+	dataReady.notify_one();
 }
 
-int Firefly::getSeqNum()
+cv::Mat Firefly::nextFrame()
 {
-	return seqNum;
-}
+	cv::Mat image;
+	std::unique_lock<std::mutex> locker(queueMutex);
 
-cv::Mat Firefly::getImage()
-{
+	while(bufferQueue.size() == 0)
+	{
+		dataReady.wait(locker);
+	}
+
+	image = bufferQueue.front();
+	bufferQueue.pop();
 	return image;
 }

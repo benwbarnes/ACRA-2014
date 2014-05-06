@@ -1,12 +1,12 @@
 CC = g++
-OUTPUTNAME = LKTrack
+OUTPUTNAME = tracker
 INCLUDE = -I/usr/include/flycapture -I/usr/include/opencv2
-LIBS = -lflycapture -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_video
-CFLAGS = -Wall -Wextra -std=c++0x
+LIBS = -lflycapture -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_video -lconfig++
+CFLAGS = -Wall -Wextra -Weffc++ -pedantic -Werror -std=c++0x -O
 
 OUTDIR = ./bin/
 
-OBJS = Display.o Firefly.o LKTrack.o Timer.o Tracker.o
+OBJS = main.o Firefly.o Display.o Tracker.o TrackingAlgorithm.o
 
 ${OUTPUTNAME}: ${OBJS}
 	${CC} -o ${OUTPUTNAME} ${OBJS} ${LIBS} ${COMMON_LIBS} 

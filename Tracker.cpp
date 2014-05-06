@@ -1,29 +1,42 @@
 #include "Tracker.hpp"
 
-Tracker::Tracker(cv::TermCriteria termCrit) : _termCrit(termCrit), _maxPoints(100) {}
-
-std::vector<cv::Point2f> Tracker::getPoints(cv::Mat frame)
+Tracker::Tracker(libconfig::Setting &settings, TrackingAlgorithm &algorithm) :	settings(settings),
+																				fly(settings),
+																				algorithm(algorithm),
+																				termCrit(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
+																				frames(),
+																				queueMutex(),
+																				maxPoints(0)
 {
-	std::vector<cv::Point2f> points;
-	cv::goodFeaturesToTrack(frame, points, _maxPoints, 0.01, 10, cv::Mat(), 3, 0, 0.04);
+	if(!settings.lookupValue("tracker/maxPoints", maxPoints)) {
+		throw std::runtime_error(std::string("Could not find \"tracker/maxPoints\" setting."));
+	}
+}
 
-	if(points.size() == 0)
-	{
-		std::cout << "Error finding points." << std::endl;
+void Tracker::update()
+{
+	/* If no frames have yet been buffered, then the next (first) frame undergoes point generation. */ 
+	while(frames.size() < 1) {
+		FlowFrame nextFrame(fly.nextFrame());
+		cv::goodFeaturesToTrack(nextFrame.image, nextFrame.points, maxPoints, 0.01, 10, cv::Mat(), 3, 0, 0.04);
+		frames.push(nextFrame);
 	}
 
-	cv::cornerSubPix(frame, points, cv::Size(10, 10), cv::Size(-1, -1), _termCrit);
-	return points;
+	/* Two frames are needed for optical flow. */
+	while(frames.size() < 2) {
+		FlowFrame nextFrame(fly.nextFrame());
+		frames.push(nextFrame);
+	}
+
+	std::lock_guard<std::mutex> locker(queueMutex);
+	FlowFrame first = frames.front();
+	frames.pop();
+	algorithm.track(first, frames.front());
 }
 
-Points Tracker::calcFlow(cv::Mat firstFrame, cv::Mat secondFrame, Points firstP)
+FlowFrame Tracker::getFrame()
 {
-	Points secondP;
-	cv::calcOpticalFlowPyrLK(firstFrame, secondFrame, firstP.points, secondP.points, secondP.status, secondP.error, cv::Size(31, 31), 3, _termCrit, 0, 0.001);
-	return secondP;
-}
-
-void Tracker::setMaxPoints(int maxPoints)
-{
-	_maxPoints = maxPoints;
+	std::lock_guard<std::mutex> locker(queueMutex);
+	FlowFrame &frame = frames.front();
+	return frame;
 }

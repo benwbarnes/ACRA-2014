@@ -1,19 +1,27 @@
 #ifndef TRACKER_H
 #define TRACKER_H
 
+#include <libconfig.h++>
 #include <opencv.hpp>
-#include "Points.hpp"
+#include <mutex>
+#include <queue>
+#include "Firefly.hpp"
+#include "FlowFrame.hpp"
+#include "TrackingAlgorithm.hpp"
 
 class Tracker
 {
-	private:
-		cv::TermCriteria _termCrit;
-		int _maxPoints;
 	public:
-		Tracker(cv::TermCriteria);
-		std::vector<cv::Point2f> getPoints(cv::Mat);
-		Points calcFlow(cv::Mat, cv::Mat, Points);
-		void setMaxPoints(int);
+		Tracker(libconfig::Setting&, TrackingAlgorithm&);
+		void update();
+		FlowFrame getFrame();
+	private:
+		libconfig::Setting &settings;
+		Firefly fly;
+		TrackingAlgorithm &algorithm;
+		cv::TermCriteria termCrit;
+		std::queue<FlowFrame> frames;
+		std::mutex queueMutex;
+		int maxPoints;
 };
-
 #endif
