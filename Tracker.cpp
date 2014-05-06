@@ -1,16 +1,14 @@
 #include "Tracker.hpp"
 
-Tracker::Tracker(libconfig::Setting &settings, TrackingAlgorithm &algorithm) :	settings(settings),
-																				fly(settings),
-																				algorithm(algorithm),
-																				termCrit(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
-																				frames(),
-																				queueMutex(),
-																				maxPoints(0)
+Tracker::Tracker(libconfig::Config &config, TrackingAlgorithm &algorithm) :	config(config),
+																			fly(config),
+																			algorithm(algorithm),
+																			termCrit(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
+																			frames(),
+																			queueMutex(),
+																			maxPoints(0)
 {
-	if(!settings.lookupValue("tracker/maxPoints", maxPoints)) {
-		throw std::runtime_error(std::string("Could not find \"tracker/maxPoints\" setting."));
-	}
+	maxPoints = config.lookup("tracker.maxPoints");
 }
 
 void Tracker::update()

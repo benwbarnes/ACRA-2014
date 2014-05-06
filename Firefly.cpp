@@ -1,6 +1,6 @@
 #include "Firefly.hpp"
 
-Firefly::Firefly(libconfig::Setting &settings) : settings(settings), cam(), busMgr(), guid(), error(), bufferQueue(), queueMutex(), dataReady()
+Firefly::Firefly(libconfig::Config &config) : config(config), cam(), busMgr(), guid(), error(), bufferQueue(), queueMutex(), dataReady()
 {
 	open();
 	start();
@@ -17,7 +17,7 @@ int Firefly::open()
 	error = busMgr.GetCameraFromIndex(0, &guid); /* Default to first camera. */
 	if(error != FlyCapture2::PGRERROR_OK)
 	{
-		throw std::runtime_error(std::string("Error finding camera: ") + error.GetDescription());	
+		throw std::runtime_error(std::string("Error finding camera: ") + error.GetDescription());
 	}
 
 	error = cam.Connect(&guid);
@@ -34,16 +34,14 @@ int Firefly::open()
 	return 0;
 }
 
+/* Note that the Firefly appears to use a Big endian architecture.
+ * (so the bit positions here do not match the datasheet) */
+
 int Firefly::start()
 {
 	uint32_t register_contents;
-	/* Note that the Firefly appears to use a Big endian architecture. */
-	/* (so the bit positions here do not match the datasheet) */
-	bool externalTrigger = false;
-	if(!settings.lookupValue("camera/externalTrigger", externalTrigger)) {
-		throw std::runtime_error(std::string("Error in configuration file: could not find setting \"camera/triggerMode\""));
-	}
 	
+	bool externalTrigger = config.lookup("camera.externalTrigger");
 	if(externalTrigger)
 	{
 		/* Set up registers */
@@ -71,7 +69,7 @@ int Firefly::start()
 	 * function pointer, but it will not accept a lambda object. */
 
 	auto onImageGet = [] (FlyCapture2::Image *pImage, const void *fly) { ((Firefly*) fly)->pushImage(pImage); };
-	
+
 	error = cam.StartCapture(onImageGet, this);
 	if(error != FlyCapture2::PGRERROR_OK)
 	{
@@ -111,7 +109,7 @@ void Firefly::pushImage(FlyCapture2::Image *rawImage)
 	unsigned int rowBytes = BGRImage.GetReceivedDataSize()/BGRImage.GetRows();
 	result = cv::Mat(BGRImage.GetRows(), BGRImage.GetCols(), CV_8UC3, BGRImage.GetData(), rowBytes);
 	cv::cvtColor(result, result, cv::COLOR_BGR2GRAY);
-	
+
 	std::unique_lock<std::mutex> locker(queueMutex);
 	bufferQueue.push(result);
 	dataReady.notify_one();

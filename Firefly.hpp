@@ -12,7 +12,7 @@
 class Firefly
 {
 	public:
-		Firefly(libconfig::Setting&);
+		Firefly(libconfig::Config&);
 		Firefly(const Firefly&) = delete;
 		Firefly& operator= (const Firefly&) = delete;
 		~Firefly();
@@ -20,7 +20,7 @@ class Firefly
 		cv::Mat nextFrame();
 
 	private:
-		libconfig::Setting &settings;
+		libconfig::Config &config;
 
 		/* PointGrey resources */
 		FlyCapture2::Camera cam;

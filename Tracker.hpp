@@ -12,11 +12,11 @@
 class Tracker
 {
 	public:
-		Tracker(libconfig::Setting&, TrackingAlgorithm&);
+		Tracker(libconfig::Config&, TrackingAlgorithm&);
 		void update();
 		FlowFrame getFrame();
 	private:
-		libconfig::Setting &settings;
+		libconfig::Config &config;
 		Firefly fly;
 		TrackingAlgorithm &algorithm;
 		cv::TermCriteria termCrit;

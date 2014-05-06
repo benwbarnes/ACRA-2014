@@ -12,10 +12,9 @@ int main()
 {
 	libconfig::Config cfg;
 	if(parseConfig(cfg) != 0) return -1;
-	libconfig::Setting &setting = cfg.getRoot();
 
 	KLT klt;
-	Tracker tracker(setting, klt);
+	Tracker tracker(cfg, klt);
 
 	Display display("App");
 	char keyPressed = '\0';
