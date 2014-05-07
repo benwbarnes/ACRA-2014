@@ -5,6 +5,7 @@
 #include <flycapture/FlyCapture2.h>
 #include <libconfig.h++>
 #include <opencv2/opencv.hpp>
+#include <map>
 #include <mutex>
 #include <queue>
 #include <stdexcept>
@@ -32,6 +33,7 @@ class Firefly
 		std::queue<cv::Mat> bufferQueue;
 		std::mutex queueMutex;
 		std::condition_variable dataReady;
+		std::map<std::string, FlyCapture2::FrameRate> framerates;
 
 		/* Wrappers for basic camera operations */
 		int open();

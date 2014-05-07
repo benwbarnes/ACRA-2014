@@ -1,7 +1,17 @@
 #include "Firefly.hpp"
 
-Firefly::Firefly(libconfig::Config &config) : config(config), cam(), busMgr(), guid(), error(), bufferQueue(), queueMutex(), dataReady()
+Firefly::Firefly(libconfig::Config &config) : config(config), cam(), busMgr(), guid(), error(), bufferQueue(), queueMutex(), dataReady(), framerates()
 {
+	/* Populate framerate map */
+	framerates["1.875"]	= FlyCapture2::FRAMERATE_1_875;
+	framerates["3.75"]	= FlyCapture2::FRAMERATE_3_75;
+	framerates["7.5"]	= FlyCapture2::FRAMERATE_7_5;
+	framerates["15"]	= FlyCapture2::FRAMERATE_15;
+	framerates["30"]	= FlyCapture2::FRAMERATE_30;
+	framerates["60"]	= FlyCapture2::FRAMERATE_60;
+	framerates["120"]	= FlyCapture2::FRAMERATE_120;
+	framerates["240"]	= FlyCapture2::FRAMERATE_240;
+
 	open();
 	start();
 }
@@ -26,18 +36,13 @@ int Firefly::open()
 		throw std::runtime_error(std::string("Error connecting to camera: ") + error.GetDescription());
 	}
 
-	int fr = config.lookup("camera.framerate");
+	std::string fr = config.lookup("camera.framerate");
 	FlyCapture2::FrameRate framerate;
-	switch(fr)
-	{
-		case 15:
-			framerate = FlyCapture2::FRAMERATE_15;
-			break;
-		case 30:
-			framerate = FlyCapture2::FRAMERATE_30;
-			break;
-		default:
-			throw std::runtime_error(std::string("camera/framerate setting is not a valid framerate. Allowed framerates are 15 or 30."));
+
+	try {
+		framerate = framerates.at(fr);
+	} catch(const std::out_of_range &oor) {
+		throw std::runtime_error(std::string("camera/framerate = ") + fr + std::string(" is not a legal framerate."));
 	}
 
 	error = cam.SetVideoModeAndFrameRate(FlyCapture2::VIDEOMODE_640x480Y8, framerate);

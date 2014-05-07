@@ -43,7 +43,8 @@ char Display::render(const FlowFrame &frame)
 		imageToBGR(workingFrame); /* Allows coloured dots to be displayed. */
 		for(uint i = 0; i < frame.status.size(); i++) {
 			if(frame.status[i] != 0) {
-				cv::circle(workingFrame, frame.points[i], 2, cv::Scalar(0, 255, 0), -1, 8);
+				cv::line(workingFrame, frame.points[i], frame.points[i], cv::Scalar(0, 0, 255), 2);
+				cv::circle(workingFrame, frame.points[i], 4, cv::Scalar(0, 255, 0), 1, CV_AA);
 			}
 		}
 	}
