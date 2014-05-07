@@ -16,9 +16,9 @@ int main()
 	KLT klt;
 	Tracker tracker(cfg, klt);
 
-	Display display("App");
-	char keyPressed = '\0';
+	Display display("App", cfg);
 
+	char keyPressed = '\0';
 	while(keyPressed != 'q') {
 		tracker.update();
 		keyPressed = display.render(tracker.getFrame());
