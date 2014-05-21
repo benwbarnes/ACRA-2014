@@ -36,13 +36,13 @@ int Firefly::open()
 		throw std::runtime_error(std::string("Error connecting to camera: ") + error.GetDescription());
 	}
 
-	std::string fr = config.lookup("camera.framerate");
+	std::string fr = config.lookup("firefly.framerate");
 	FlyCapture2::FrameRate framerate;
 
 	try {
 		framerate = framerates.at(fr);
 	} catch(const std::out_of_range &oor) {
-		throw std::runtime_error(std::string("camera/framerate = ") + fr + std::string(" is not a legal framerate."));
+		throw std::runtime_error(std::string("firefly/framerate = ") + fr + std::string(" is not a legal framerate."));
 	}
 
 	error = cam.SetVideoModeAndFrameRate(FlyCapture2::VIDEOMODE_640x480Y8, framerate);
@@ -60,7 +60,7 @@ int Firefly::start()
 {
 	uint32_t register_contents;
 
-	bool externalTrigger = config.lookup("camera.externalTrigger");
+	bool externalTrigger = config.lookup("firefly.externalTrigger");
 	if(externalTrigger)
 	{
 		/* Set up registers */

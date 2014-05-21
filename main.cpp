@@ -1,6 +1,7 @@
 #include <iostream>
 #include <libconfig.h++>
 #include <memory>
+#include "CVVideoCapture.hpp"
 #include "Display.hpp"
 #include "Firefly.hpp"
 #include "Tracker.hpp"
@@ -13,8 +14,20 @@ int main()
 	libconfig::Config cfg;
 	if(parseConfig(cfg) != 0) return -1;
 
+	Camera *camPtr;
+	if(cfg.lookup("camera.useFirefly"))
+	{
+		camPtr = new Firefly(cfg);
+	}
+	else
+	{
+		camPtr = new CVVideoCapture();
+	}
+
+	Camera &cam(*camPtr);
+
 	KLT klt;
-	Tracker tracker(cfg, klt);
+	Tracker tracker(cfg, klt, cam);
 
 	Display display("App", cfg);
 
@@ -24,6 +37,7 @@ int main()
 		keyPressed = display.render(tracker.getFrame());
 	}
 
+	delete camPtr;
 	return 0;
 }
 

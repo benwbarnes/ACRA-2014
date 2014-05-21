@@ -9,8 +9,9 @@
 #include <mutex>
 #include <queue>
 #include <stdexcept>
+#include "Camera.hpp"
 
-class Firefly
+class Firefly : public Camera
 {
 	public:
 		Firefly(libconfig::Config&);
