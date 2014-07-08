@@ -6,7 +6,7 @@ CFLAGS = -Wall -Wextra -Weffc++ -pedantic -Werror -std=c++0x -O
 
 OUTDIR = ./bin/
 
-OBJS = main.o Firefly.o Display.o Tracker.o TrackingAlgorithm.o
+OBJS = main.o Firefly.o Display.o Tracker.o TrackingAlgorithm.o PointManager.o
 
 ${OUTPUTNAME}: ${OBJS}
 	${CC} -o ${OUTPUTNAME} ${OBJS} ${LIBS} ${COMMON_LIBS} 
