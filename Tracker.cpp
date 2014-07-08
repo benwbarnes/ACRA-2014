@@ -1,12 +1,14 @@
 #include "Tracker.hpp"
 
-Tracker::Tracker(libconfig::Config &config, TrackingAlgorithm &algorithm, Camera &cam) :	config(config),
-																							cam(cam),
-																							algorithm(algorithm),
-																							termCrit(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
-																							frames(),
-																							queueMutex(),
-																							maxPoints(0)
+Tracker::Tracker(libconfig::Config &config, TrackingAlgorithm &algorithm, Camera &cam):
+	config(config),
+	cam(cam),
+	algorithm(algorithm),
+	termCrit(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
+	frames(),
+	queueMutex(),
+	maxPoints(0),
+	pMgr(config)
 {
 	maxPoints = config.lookup("tracker.maxPoints");
 }
@@ -16,7 +18,7 @@ void Tracker::update()
 	/* If no frames have yet been buffered, then the next (first) frame undergoes point generation. */ 
 	while(frames.size() < 1) {
 		FlowFrame nextFrame(cam.nextFrame());
-		cv::goodFeaturesToTrack(nextFrame.image, nextFrame.points, maxPoints, 0.01, 10, cv::Mat(), 3, 0, 0.04);
+		pMgr.initialise(nextFrame);
 		frames.push(nextFrame);
 	}
 
@@ -30,6 +32,7 @@ void Tracker::update()
 	FlowFrame first = frames.front();
 	frames.pop();
 	algorithm.track(first, frames.front());
+	pMgr.update(frames.front());
 }
 
 FlowFrame Tracker::getFrame()

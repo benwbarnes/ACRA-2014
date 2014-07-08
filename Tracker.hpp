@@ -7,21 +7,23 @@
 #include <queue>
 #include "Firefly.hpp"
 #include "FlowFrame.hpp"
+#include "PointManager.hpp"
 #include "TrackingAlgorithm.hpp"
 
 class Tracker
 {
-	public:
-		Tracker(libconfig::Config&, TrackingAlgorithm&, Camera &cam);
-		void update();
-		FlowFrame getFrame();
-	private:
-		libconfig::Config &config;
-		Camera &cam;
-		TrackingAlgorithm &algorithm;
-		cv::TermCriteria termCrit;
-		std::queue<FlowFrame> frames;
-		std::mutex queueMutex;
-		int maxPoints;
+public:
+	Tracker(libconfig::Config&, TrackingAlgorithm&, Camera &cam);
+	void update();
+	FlowFrame getFrame();
+private:
+	libconfig::Config &config;
+	Camera &cam;
+	TrackingAlgorithm &algorithm;
+	cv::TermCriteria termCrit;
+	std::queue<FlowFrame> frames;
+	std::mutex queueMutex;
+	int maxPoints;
+	PointManager pMgr;
 };
 #endif

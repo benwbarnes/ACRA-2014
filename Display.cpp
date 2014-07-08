@@ -1,6 +1,11 @@
 #include "Display.hpp"
 
-Display::Display(std::string appTitle, libconfig::Config &config) : appTitle(appTitle), config(config), displayOn(false), frameCount(0), workingFrame()
+Display::Display(std::string appTitle, libconfig::Config &config):
+	appTitle(appTitle),
+	config(config),
+	displayOn(false),
+	frameCount(0),
+	workingFrame()
 {
 	displayOn = config.lookup("display.displayOn");
 	if(displayOn) {
@@ -35,13 +40,8 @@ char Display::render(const FlowFrame &frame)
 	if(displayOn) {
 		workingFrame = frame.image.clone();
 
-		if(frame.status.size() != frame.points.size()) {
-			std::cerr << "Frame error: \"points\" and \"status\" vectors of different dimension." << std::endl;
-			return '\0';
-		}
-
 		imageToBGR(workingFrame); /* Allows coloured dots to be displayed. */
-		for(uint i = 0; i < frame.status.size(); i++) {
+		for(uint i = 0; i < frame.points.size(); i++) {
 			if(frame.status[i] != 0) {
 				cv::line(workingFrame, frame.points[i], frame.points[i], cv::Scalar(0, 0, 255), 2);
 				cv::circle(workingFrame, frame.points[i], 4, cv::Scalar(0, 255, 0), 1, CV_AA);

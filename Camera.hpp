@@ -3,9 +3,9 @@
 
 class Camera
 {
-	public:
-		virtual ~Camera() {};
-		virtual cv::Mat nextFrame() = 0;
+public:
+	virtual ~Camera() {};
+	virtual cv::Mat nextFrame() = 0;
 };
 
 #endif

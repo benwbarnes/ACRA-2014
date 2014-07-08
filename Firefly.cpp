@@ -1,6 +1,15 @@
 #include "Firefly.hpp"
 
-Firefly::Firefly(libconfig::Config &config) : config(config), cam(), busMgr(), guid(), error(), bufferQueue(), queueMutex(), dataReady(), framerates()
+Firefly::Firefly(libconfig::Config &config):
+	config(config),
+	cam(),
+	busMgr(),
+	guid(),
+	error(),
+	bufferQueue(),
+	queueMutex(),
+	dataReady(),
+	framerates()
 {
 	/* Populate framerate map */
 	framerates["1.875"]	= FlyCapture2::FRAMERATE_1_875;

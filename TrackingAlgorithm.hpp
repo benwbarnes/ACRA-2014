@@ -6,18 +6,18 @@
 
 class TrackingAlgorithm
 {
-	public:
-		virtual ~TrackingAlgorithm() {};
-		virtual int track(FlowFrame&, FlowFrame&) = 0;
+public:
+	virtual ~TrackingAlgorithm() {};
+	virtual int track(FlowFrame&, FlowFrame&) = 0;
 };
 
 class KLT : public TrackingAlgorithm
 {
-	public:
-		KLT() : termCrit(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)) {};
-		int track(FlowFrame&, FlowFrame&);
-	private:
-		cv::TermCriteria termCrit;
+public:
+	KLT() : termCrit(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)) {};
+	int track(FlowFrame&, FlowFrame&);
+private:
+	cv::TermCriteria termCrit;
 };
 
 #endif
