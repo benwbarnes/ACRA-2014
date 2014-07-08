@@ -28,7 +28,27 @@ public:
 	void update(FlowFrame &frame)
 	{
 		auto pt = frame.points.begin();
-		for(; pt != frame.points.end(); ++pt);
+		auto st = frame.status.begin();
+		auto er = frame.error.begin();
+
+		while(pt != frame.points.end())
+		{
+			if(*st == 0)
+			{
+				pt = frame.points.erase(pt);
+				st = frame.status.erase(st);
+				er = frame.error.erase(er);
+			}
+
+			++pt;
+			++st;
+			++er;
+		}
+
+		if((int)frame.points.size() < minPoints)
+		{
+			initialise(frame);
+		}
 	}
 
 private:
