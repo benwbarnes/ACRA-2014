@@ -1,0 +1,1 @@
+g++ main.cpp -lopencv_core -lopencv_highgui -lopencv_features2d -lopencv_imgproc -o main --std=c++11
