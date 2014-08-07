@@ -25,17 +25,18 @@ int main(int argc, char *argv[]) {
 
 	// Create file path for images
 	std::string filePath(argv[1]);
-	filePath.append("frame%04d.png");
+	filePath.append("image%03d.jpg");
 
 	// Set up collection of extractors
 	std::vector<std::unique_ptr<FeatureExtractor>> extractors;
 	extractors.push_back(getExtractor("harris"));
 	extractors.push_back(getExtractor("shitomasi"));
 	extractors.push_back(getExtractor("fast"));
+	extractors.push_back(getExtractor("agast"));
 
 	// Get an initial image for extractors
 	std::string initialImagePath(argv[1]);
-	initialImagePath.append("frame0001.png");
+	initialImagePath.append("image001.jpg");
 	cv::Mat initialImage = cv::imread(initialImagePath, 0);
 
 	// Set up a window for display
@@ -69,11 +70,14 @@ int main(int argc, char *argv[]) {
 		while(secondImage.data != NULL) {
 			cv::calcOpticalFlowPyrLK(firstImage, secondImage, firstPoints, secondPoints, status, error, cv::Size(31, 31), 3, termCrit, 0, 0.001);
 
+			// Remove untracked points
 			for(unsigned int pt = 0; pt < status.size(); pt++) {
 				if(status[pt] == 0) {
 					secondPoints.erase(secondPoints.begin() + pt);
 				}
 			}
+
+			if(secondPoints.size() == 0) break;
 
 			firstPoints = secondPoints;
 			firstImage = secondImage;

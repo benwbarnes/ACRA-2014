@@ -1,2 +1,2 @@
 #!/bin/bash
-./bin/acra_experiment images/ 50
+./bin/acra_experiment ../images/ 50
