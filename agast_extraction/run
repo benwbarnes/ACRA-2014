@@ -1,0 +1,5 @@
+#!/bin/bash
+for POINTS in {1..200}
+do
+	./main test_image.png $POINTS
+done

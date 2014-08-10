@@ -4,28 +4,56 @@
 
 #define MASK_KEEPOUT_SIZE 5 // Half the diagonal length of the rectangle used to mask off points when refreshing
 
-void refreshPoints(const cv::Mat&, std::vector<cv::Point2f>&, const std::unique_ptr<FeatureExtractor>&, int);
+std::unique_ptr<std::vector<cv::Point2f>> refreshPoints(const cv::Mat&, std::vector<cv::Point2f>&, const std::unique_ptr<FeatureExtractor>&, int);
 void imageToBGR(cv::Mat&);
+
+class Timer {
+public:
+	double initialTime = 0;
+	double finalTime = 0;
+
+	void start() {
+		initialTime = (double)cv::getTickCount();
+	}
+
+	void stop() {
+		finalTime = (double)cv::getTickCount();
+	}
+
+	// Returns time in ms
+	double getTime() {
+		double time = ((1000*(finalTime - initialTime))/cv::getTickFrequency());
+		return time;
+	}
+};
 
 int main(int argc, char *argv[]) {
 
 	// Check args
-	if(argc != 3) {
-		std::cout << "Usage: " << argv[0] << " image_folder  num_points" << std::endl;
+	if(argc != 4) {
+		std::cout << "Usage: " << argv[0] << " image_folder  num_points tracking_threshold(0.001)" << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	// Get num_points
-	std::istringstream ss(argv[2]);
+	std::istringstream num_points_ss(argv[2]);
 	int numPoints = 0;
-	if(!(ss >> numPoints)) {
+	if(!(num_points_ss >> numPoints)) {
 		std::cout << "Please enter a valid number for num_points" << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	// Get tracking threshold
+	std::istringstream threshold_ss(argv[3]);
+	float threshold = 0;
+	if(!(threshold_ss >> threshold)) {
+		std::cout << "Please enter a valid number for threshold" << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	// Create file path for images
 	std::string filePath(argv[1]);
-	filePath.append("image%03d.jpg");
+	filePath.append("image%03d.png");
 
 	// Set up collection of extractors
 	std::vector<std::unique_ptr<FeatureExtractor>> extractors;
@@ -36,7 +64,7 @@ int main(int argc, char *argv[]) {
 
 	// Get an initial image for extractors
 	std::string initialImagePath(argv[1]);
-	initialImagePath.append("image001.jpg");
+	initialImagePath.append("image001.png");
 	cv::Mat initialImage = cv::imread(initialImagePath, 0);
 
 	// Set up a window for display
@@ -47,11 +75,22 @@ int main(int argc, char *argv[]) {
 
 	for(unsigned int ex = 0; ex < extractors.size(); ex++) {
 
+		// Print .csv heading row
+		std::cout << "Name" << '\t' << "frame_num" << '\t' << "pts_tracked" << '\t' << "pts_added" << '\t';
+		std::cout <<  "loop_time" << '\t' << "track_time" << '\t' << "mgmt_time" << std::endl;
+
 		// Set up structures for KLT
 		cv::Mat firstImage, secondImage;
 		std::vector<cv::Point2f> firstPoints, secondPoints;
 		std::vector<uint8_t> status;
 		std::vector<float> error;
+		std::unique_ptr<std::vector<cv::Point2f>> newPoints;
+		int num_points_added = 0;
+
+		// Set up timers
+		Timer full_loop_timer;
+		Timer tracker_timer;
+		Timer point_management_timer;
 
 		// Prepare video stream and images
 		cv::VideoCapture video(filePath);
@@ -68,9 +107,13 @@ int main(int argc, char *argv[]) {
 
 		// Run KLT loop over images
 		while(secondImage.data != NULL) {
-			cv::calcOpticalFlowPyrLK(firstImage, secondImage, firstPoints, secondPoints, status, error, cv::Size(31, 31), 3, termCrit, 0, 0.001);
+			full_loop_timer.start();
+			tracker_timer.start();
+			cv::calcOpticalFlowPyrLK(firstImage, secondImage, firstPoints, secondPoints, status, error, cv::Size(31, 31), 3, termCrit, 0, threshold);
+			tracker_timer.stop();
 
 			// Remove untracked points
+			point_management_timer.start();
 			for(unsigned int pt = 0; pt < status.size(); pt++) {
 				if(status[pt] == 0) {
 					secondPoints.erase(secondPoints.begin() + pt);
@@ -82,7 +125,17 @@ int main(int argc, char *argv[]) {
 			firstPoints = secondPoints;
 			firstImage = secondImage;
 
-			refreshPoints(secondImage, secondPoints, extractors[ex], 50);
+			newPoints = refreshPoints(secondImage, secondPoints, extractors[ex], numPoints);
+			num_points_added = 0;
+			if(newPoints != NULL) {
+				for(auto pt : *newPoints) {
+					firstPoints.push_back(pt);
+				}
+				num_points_added = newPoints->size();
+				newPoints->clear();
+			}
+			point_management_timer.stop();
+			full_loop_timer.stop();
 
 			// Display image with points
 			imageToBGR(secondImage);
@@ -94,7 +147,8 @@ int main(int argc, char *argv[]) {
 			cv::imshow("ACRA Experiment", secondImage);
 			cv::waitKey(1);
 
-			std::cout << extractors[ex]->name << '\t' << frameNumber << '\t' << secondPoints.size() << std::endl;
+			std::cout << extractors[ex]->name << '\t' << frameNumber << '\t' << secondPoints.size() << '\t' << num_points_added << '\t';
+			std::cout << full_loop_timer.getTime() << '\t' << tracker_timer.getTime() << '\t' << point_management_timer.getTime() << std::endl;
 			video >> secondImage;
 			frameNumber++;
 		}
@@ -105,17 +159,21 @@ int main(int argc, char *argv[]) {
 	return EXIT_SUCCESS;
 }
 
-void refreshPoints(const cv::Mat &image, std::vector<cv::Point2f> &currentPoints, const std::unique_ptr<FeatureExtractor> &ex, int numPoints) {
-	// Construct mask
-	cv::Point2f halfDiagonal(MASK_KEEPOUT_SIZE, MASK_KEEPOUT_SIZE);
-	cv::Mat mask(image.size(), image.type(), cv::Scalar(255));
-	for(auto pt : currentPoints) {
-		cv::rectangle(mask, (pt - halfDiagonal), (pt + halfDiagonal), cv::Scalar(0), -1, 8, 0);
-	}
+std::unique_ptr<std::vector<cv::Point2f>> refreshPoints(const cv::Mat &image, std::vector<cv::Point2f> &currentPoints, const std::unique_ptr<FeatureExtractor> &ex, int numPoints) {
+	std::unique_ptr<std::vector<cv::Point2f>> newPoints;
+	if(currentPoints.size() < (unsigned int)numPoints) {
+		// Construct mask
+		cv::Point2f halfDiagonal(MASK_KEEPOUT_SIZE, MASK_KEEPOUT_SIZE);
+		cv::Mat mask(image.size(), image.type(), cv::Scalar(255));
+		for(auto pt : currentPoints) {
+			cv::rectangle(mask, (pt - halfDiagonal), (pt + halfDiagonal), cv::Scalar(0), -1, 8, 0);
+		}
 
-	// Get vector of new points from extractor
-	int newFeaturesRequired = numPoints - currentPoints.size();
-	std::unique_ptr<std::vector<cv::Point2f>> newPoints = ex->extractFeatures(image, mask, newFeaturesRequired);
+		// Get vector of new points from extractor
+		int newFeaturesRequired = numPoints - currentPoints.size();
+		newPoints = ex->extractFeatures(image, mask, newFeaturesRequired);
+	}
+	return newPoints;
 }
 
 void imageToBGR(cv::Mat &image) {

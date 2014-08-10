@@ -64,14 +64,14 @@ int main(int argc, char *argv[]) {
 	int FAST_Threshold = 9;
 	do {
 		FAST_Threshold++;
+		points_FAST.clear();
 		timer_FAST.start();
 		cv::FAST(image, keypoints_FAST, FAST_Threshold, true);
+		for(auto kp : keypoints_FAST) {
+			points_FAST.push_back(kp.pt); // Grabs the 2D point data in isolation.
+		}
 		timer_FAST.stop();
 	} while(keypoints_FAST.size() > num_points);
-
-	for(auto kp : keypoints_FAST) {
-		points_FAST.push_back(kp.pt); // Grabs the 2D point data in isolation.
-	}
 
 	std::cout << num_points << "\t";
 	std::cout << points_Harris.size() << "\t" << timer_Harris.getTime() << "\t";
