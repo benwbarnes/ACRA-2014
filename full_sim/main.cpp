@@ -30,8 +30,8 @@ public:
 int main(int argc, char *argv[]) {
 
 	// Check args
-	if(argc != 4) {
-		std::cout << "Usage: " << argv[0] << " image_folder  num_points tracking_threshold(0.001)" << std::endl;
+	if(argc != 5) {
+		std::cout << "Usage: " << argv[0] << " image_folder  num_points tracking_threshold(0.001) pm_on[1|0]" << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -48,6 +48,14 @@ int main(int argc, char *argv[]) {
 	float threshold = 0;
 	if(!(threshold_ss >> threshold)) {
 		std::cout << "Please enter a valid number for threshold" << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	// Get point_management_on
+	std::istringstream pm_on_ss(argv[4]);
+	int pm_on = 0;
+	if(!(pm_on_ss >> pm_on)) {
+		std::cout << "Please enter a valid number for pm_on (1 or 0)" << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -76,8 +84,15 @@ int main(int argc, char *argv[]) {
 	for(unsigned int ex = 0; ex < extractors.size(); ex++) {
 
 		// Print .csv heading row
-		std::cout << "Name" << '\t' << "frame_num" << '\t' << "pts_tracked" << '\t' << "pts_added" << '\t';
-		std::cout <<  "loop_time" << '\t' << "track_time" << '\t' << "mgmt_time" << std::endl;
+		std::cout << "Name" << '\t' << "frame_num" << '\t' << "pts_tracked" << '\t';
+		if(pm_on) {
+			std::cout << "pts_added" << '\t';
+		}
+		std::cout <<  "loop_time" << '\t' << "track_time";
+		if(pm_on) {
+			std::cout << '\t' << "mgmt_time";
+		}
+		std::cout << std::endl;
 
 		// Set up structures for KLT
 		cv::Mat firstImage, secondImage;
@@ -113,30 +128,35 @@ int main(int argc, char *argv[]) {
 			tracker_timer.stop();
 
 			// Remove untracked points
-			point_management_timer.start();
+			if(pm_on) {
+				point_management_timer.start();
+			}
 			for(unsigned int pt = 0; pt < status.size(); pt++) {
 				if(status[pt] == 0) {
 					secondPoints.erase(secondPoints.begin() + pt);
 				}
 			}
 
-			if(secondPoints.size() == 0) break;
+			if((!pm_on) && secondPoints.size() == 0) break;
 
 			firstPoints = secondPoints;
 			firstImage = secondImage;
 
-			newPoints = refreshPoints(secondImage, secondPoints, extractors[ex], numPoints);
-			num_points_added = 0;
-			if(newPoints != NULL) {
-				for(auto pt : *newPoints) {
-					firstPoints.push_back(pt);
+			// Point management
+			if(pm_on) {
+				newPoints = refreshPoints(secondImage, secondPoints, extractors[ex], numPoints);
+				num_points_added = 0;
+				if(newPoints != NULL) {
+					for(auto pt : *newPoints) {
+						firstPoints.push_back(pt);
+					}
+					num_points_added = newPoints->size();
+					newPoints->clear();
 				}
-				num_points_added = newPoints->size();
-				newPoints->clear();
+				point_management_timer.stop();
 			}
-			point_management_timer.stop();
-			full_loop_timer.stop();
 
+			full_loop_timer.stop();
 			// Display image with points
 			imageToBGR(secondImage);
 			for(auto pt : secondPoints) {
@@ -148,7 +168,11 @@ int main(int argc, char *argv[]) {
 			cv::waitKey(1);
 
 			std::cout << extractors[ex]->name << '\t' << frameNumber << '\t' << secondPoints.size() << '\t' << num_points_added << '\t';
-			std::cout << full_loop_timer.getTime() << '\t' << tracker_timer.getTime() << '\t' << point_management_timer.getTime() << std::endl;
+			std::cout << full_loop_timer.getTime() << '\t' << tracker_timer.getTime();
+			if(pm_on) {
+				std::cout << '\t' << point_management_timer.getTime();
+			}
+			std::cout << std::endl;
 			video >> secondImage;
 			frameNumber++;
 		}
