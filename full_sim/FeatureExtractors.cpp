@@ -64,15 +64,14 @@ std::unique_ptr<std::vector<cv::Point2f>> ShiTomasi::extractFeatures(const cv::M
 	return points;
 }
 
-Agast::Agast(const std::string &exName) :	FeatureExtractor(exName),
-						brisk(30, 0, 1.0) {}
+Agast::Agast(const std::string &exName) : FeatureExtractor(exName), brisk(cv::FeatureDetector::create("BRISK")) {}
 
 std::unique_ptr<std::vector<cv::Point2f>> Agast::extractFeatures(const cv::Mat &inputImage, const cv::Mat &mask, int numPoints) {
 	if(numPoints < 0) { numPoints = maxPoints; }
 	std::vector<cv::KeyPoint> kPoints;
 	std::unique_ptr<std::vector<cv::Point2f>> points(new std::vector<cv::Point2f>);
-	brisk(inputImage, mask, kPoints, cv::noArray(), false);
-
+//	brisk(inputImage, mask, kPoints, cv::noArray(), false);
+	brisk->detect(inputImage, kPoints);
 	std::sort(kPoints.begin(), kPoints.end(), [] (const cv::KeyPoint &kp1, const cv::KeyPoint &kp2) { return kp1.response > kp2.response; });
 
 	unsigned int index = 0;

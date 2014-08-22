@@ -50,7 +50,8 @@ public:
 	std::unique_ptr<std::vector<cv::Point2f>> extractFeatures(const cv::Mat&, const cv::Mat&, int);
 	std::unique_ptr<std::vector<cv::Point2f>> extractFeatures(const cv::Mat&, int);
 private:
-	cv::BRISK brisk;
+//	cv::BRISK brisk;
+	cv::Ptr<cv::FeatureDetector> brisk;
 };
 
 std::unique_ptr<FeatureExtractor> getExtractor(const std::string&);

@@ -65,9 +65,9 @@ int main(int argc, char *argv[]) {
 
 	// Set up collection of extractors
 	std::vector<std::unique_ptr<FeatureExtractor>> extractors;
-	extractors.push_back(getExtractor("harris"));
-	extractors.push_back(getExtractor("shitomasi"));
-	extractors.push_back(getExtractor("fast"));
+//	extractors.push_back(getExtractor("harris"));
+//	extractors.push_back(getExtractor("shitomasi"));
+//	extractors.push_back(getExtractor("fast"));
 	extractors.push_back(getExtractor("agast"));
 
 	// Get an initial image for extractors
@@ -111,6 +111,8 @@ int main(int argc, char *argv[]) {
 		cv::VideoCapture video(filePath);
 		video >> firstImage;
 		video >> secondImage;
+//		cv::cvtColor(firstImage, firstImage, 6);
+//		cv::cvtColor(secondImage, secondImage, 6);
 
 		// Copy set of initial points into the working set (firstPoints)
 		std::unique_ptr<std::vector<cv::Point2f>> initialPoints = extractors[ex]->extractFeatures(initialImage, numPoints);
@@ -124,7 +126,7 @@ int main(int argc, char *argv[]) {
 		while(secondImage.data != NULL) {
 			full_loop_timer.start();
 			tracker_timer.start();
-			cv::calcOpticalFlowPyrLK(firstImage, secondImage, firstPoints, secondPoints, status, error, cv::Size(31, 31), 3, termCrit, 0, threshold);
+			cv::calcOpticalFlowPyrLK(firstImage, secondImage, firstPoints, secondPoints, status, error, cv::Size(31, 31), 3, termCrit, cv::OPTFLOW_LK_GET_MIN_EIGENVALS, threshold);
 			tracker_timer.stop();
 
 			// Remove untracked points
@@ -167,13 +169,17 @@ int main(int argc, char *argv[]) {
 			cv::imshow("ACRA Experiment", secondImage);
 			cv::waitKey(1);
 
-			std::cout << extractors[ex]->name << '\t' << frameNumber << '\t' << secondPoints.size() << '\t' << num_points_added << '\t';
-			std::cout << full_loop_timer.getTime() << '\t' << tracker_timer.getTime();
+			std::cout << extractors[ex]->name << '\t' << frameNumber << '\t' << secondPoints.size();
+			if(pm_on) {
+				std::cout << '\t' << num_points_added;
+			}
+			std::cout << '\t' << full_loop_timer.getTime() << '\t' << tracker_timer.getTime();
 			if(pm_on) {
 				std::cout << '\t' << point_management_timer.getTime();
 			}
 			std::cout << std::endl;
 			video >> secondImage;
+//			cv::cvtColor(secondImage, secondImage, 6);
 			frameNumber++;
 		}
 

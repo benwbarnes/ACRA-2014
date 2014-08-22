@@ -1,8 +1,8 @@
 CC = g++
 OUTPUTNAME = acra_experiment
 INCLUDE = -I/usr/include/flycapture -I/usr/include/opencv2
-LIBS = -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_video -lopencv_videoio -lopencv_imgcodecs
-CFLAGS = -Wall -Wextra -Weffc++ -pedantic -std=c++0x -O
+LIBS = -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_video #-lopencv_videoio -lopencv_imgcodecs
+CFLAGS = -Wall -Wextra -Weffc++ -pedantic -std=c++0x -O -ggdb
 
 OUTDIR = ./bin/
 
