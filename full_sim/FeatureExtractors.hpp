@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "agast.h"
+
 enum ExtractorType {
 	FAST,
 	HARRIS,
@@ -52,6 +54,15 @@ public:
 private:
 //	cv::BRISK brisk;
 	cv::Ptr<cv::FeatureDetector> brisk;
+};
+
+class AgastNoCV : public FeatureExtractor {
+public:
+	AgastNoCV(const std::string&);
+	std::unique_ptr<std::vector<cv::Point2f>> extractFeatures(const cv::Mat&, const cv::Mat&, int);
+	std::unique_ptr<std::vector<cv::Point2f>> extractFeatures(const cv::Mat&, int);
+private:
+	std::unique_ptr<AgastDetector7_12s> agast7_12s;
 };
 
 std::unique_ptr<FeatureExtractor> getExtractor(const std::string&);

@@ -87,6 +87,43 @@ std::unique_ptr<std::vector<cv::Point2f>> Agast::extractFeatures(const cv::Mat &
 	return extractFeatures(inputImage, cv::Mat(), numPoints);
 }
 
+AgastNoCV::AgastNoCV(const std::string &exName) :
+	FeatureExtractor(exName),
+	agast7_12s()
+{
+
+}
+
+std::unique_ptr<std::vector<cv::Point2f>> AgastNoCV::extractFeatures(const cv::Mat &inputImage, const cv::Mat &mask, int numPoints) {
+	if(agast7_12s == NULL) {
+		agast7_12s = std::unique_ptr<AgastDetector7_12s>(new AgastDetector7_12s(inputImage.size().width, inputImage.size().height, 120));
+	}
+
+	if(agast7_12s == NULL) {
+		return NULL;
+	}
+
+	if(numPoints < 0) { numPoints = maxPoints; }
+
+	agast7_12s->processImage((unsigned char*)inputImage.data);
+
+	std::vector<CvPoint> cvPoints = agast7_12s->get_corners_all();
+	std::unique_ptr<std::vector<cv::Point2f>> points(new std::vector<cv::Point2f>);
+
+	unsigned int index = 0;
+	while(points->size() < (unsigned int)numPoints && index < cvPoints.size()) {
+		cv::Point2f temp_point(cvPoints[index]);
+		points->push_back(temp_point);
+		index++;
+	}
+
+	return points;
+}
+
+std::unique_ptr<std::vector<cv::Point2f>> AgastNoCV::extractFeatures(const cv::Mat &inputImage, int numPoints) {
+	return extractFeatures(inputImage, cv::Mat(), numPoints);
+}
+
 std::unique_ptr<FeatureExtractor> getExtractor(const std::string &exType) {
 	FeatureExtractor *exRaw = NULL;
 
@@ -94,7 +131,7 @@ std::unique_ptr<FeatureExtractor> getExtractor(const std::string &exType) {
 	else if(exType == "harris")	{ exRaw = new Harris("Harris"); }
 	else if(exType == "shitomasi")	{ exRaw = new ShiTomasi("Shi Tomasi"); }
 	else if(exType == "agast")	{ exRaw = new Agast("AGAST"); }
-
+	else if(exType == "agastNoCV")	{ exRaw = new AgastNoCV("AGAST_NoCV"); }
 	std::unique_ptr<FeatureExtractor> ex(exRaw);
 	return ex;
 }

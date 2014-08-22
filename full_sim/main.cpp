@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
 //	extractors.push_back(getExtractor("shitomasi"));
 //	extractors.push_back(getExtractor("fast"));
 	extractors.push_back(getExtractor("agast"));
+	extractors.push_back(getExtractor("agastNoCV"));
 
 	// Get an initial image for extractors
 	std::string initialImagePath(argv[1]);

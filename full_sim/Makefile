@@ -9,7 +9,7 @@ OUTDIR = ./bin/
 OBJS = main.o FeatureExtractors.o
 
 ${OUTPUTNAME}: ${OBJS}
-	${CC} -o ${OUTPUTNAME} ${OBJS} ${LIBS} ${COMMON_LIBS} 
+	${CC} -o ${OUTPUTNAME} ${OBJS} ${LIBS} ${COMMON_LIBS} agast.a
 	mv ${OUTPUTNAME} ${OUTDIR}
 
 %.o: %.cpp
