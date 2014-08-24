@@ -74,10 +74,21 @@ std::unique_ptr<std::vector<cv::Point2f>> Agast::extractFeatures(const cv::Mat &
 	brisk->detect(inputImage, kPoints);
 	std::sort(kPoints.begin(), kPoints.end(), [] (const cv::KeyPoint &kp1, const cv::KeyPoint &kp2) { return kp1.response > kp2.response; });
 
+	// Copy the best points to the vector of new points, checking them against the mask.
 	unsigned int index = 0;
-	while(points->size() < (unsigned int)numPoints) {
-		points->push_back(kPoints[index].pt);
-		index++;
+	if(!mask.empty()) {
+		while(points->size() < (unsigned int)numPoints && (unsigned int)index < kPoints.size()) {
+			if(mask.at<float>(kPoints[index].pt.x, kPoints[index].pt.y) != 0) {
+				points->push_back(kPoints[index].pt);
+			}
+			index++;
+		}
+	}
+	else {
+		while(points->size() < (unsigned int)numPoints) {
+			points->push_back(kPoints[index].pt);
+			index++;
+		}
 	}
 
 	return points;
@@ -111,10 +122,21 @@ std::unique_ptr<std::vector<cv::Point2f>> AgastNoCV::extractFeatures(const cv::M
 	std::unique_ptr<std::vector<cv::Point2f>> points(new std::vector<cv::Point2f>);
 
 	unsigned int index = 0;
-	while(points->size() < (unsigned int)numPoints && index < cvPoints.size()) {
-		cv::Point2f temp_point(cvPoints[index]);
-		points->push_back(temp_point);
-		index++;
+	if(!mask.empty()) {
+		while(points->size() < (unsigned int)numPoints && index < cvPoints.size()) {
+			cv::Point2f temp_point(cvPoints[index]);
+			if(mask.at<float>(temp_point.x, temp_point.y) != 0) {
+				points->push_back(temp_point);
+			}
+			index++;
+		}
+	}
+	else {
+		while(points->size() < (unsigned int)numPoints && index < cvPoints.size()) {
+			cv::Point2f temp_point(cvPoints[index]);
+			points->push_back(temp_point);
+			index++;
+		}
 	}
 
 	return points;

@@ -65,9 +65,9 @@ int main(int argc, char *argv[]) {
 
 	// Set up collection of extractors
 	std::vector<std::unique_ptr<FeatureExtractor>> extractors;
-//	extractors.push_back(getExtractor("harris"));
-//	extractors.push_back(getExtractor("shitomasi"));
-//	extractors.push_back(getExtractor("fast"));
+	extractors.push_back(getExtractor("harris"));
+	extractors.push_back(getExtractor("shitomasi"));
+	extractors.push_back(getExtractor("fast"));
 	extractors.push_back(getExtractor("agast"));
 	extractors.push_back(getExtractor("agastNoCV"));
 
