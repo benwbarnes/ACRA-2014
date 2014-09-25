@@ -1,2 +1,7 @@
+results/*
+
+*.png
+*.jpg
+*.jpeg
 *.o
-./images
+*bin*

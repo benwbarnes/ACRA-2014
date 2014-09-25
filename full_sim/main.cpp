@@ -78,6 +78,8 @@ int main(int argc, char *argv[]) {
 
 	// Set up a window for display
 	cv::namedWindow("ACRA Experiment", cv::WINDOW_AUTOSIZE);
+	cv::imshow("ACRA Experiment", initialImage);
+	cv::waitKey(0);
 
 	// Set up termination criteria for KLT
 	cv::TermCriteria termCrit(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01);
@@ -168,7 +170,7 @@ int main(int argc, char *argv[]) {
 
 
 			cv::imshow("ACRA Experiment", secondImage);
-			cv::waitKey(1);
+			cv::waitKey(9*(int)full_loop_timer.getTime());
 
 			std::cout << extractors[ex]->name << '\t' << frameNumber << '\t' << secondPoints.size();
 			if(pm_on) {

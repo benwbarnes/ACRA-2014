@@ -1,2 +1,2 @@
 #!/bin/bash
-./bin/acra_experiment ../video_capture/take2/ 50 0.001 1
+./bin/acra_experiment ./exp_3/ 30 $1 1
